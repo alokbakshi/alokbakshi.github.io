@@ -1,0 +1,76 @@
+---
+layout: post
+title:  Matrix Multiplication - 1
+date:   2018-07-11 
+permalink: /matmul-1
+author: "Alok Bakshi"
+---
+
+### Matrices in C
+
+In C language, one can store matrices in either row or column major formats. For example, the following code below retrieves `(row, col)` element of `N` by `N` matrix stored in column major format
+
+{% highlight c %}
+inline int array_idx(int N, int row, int col)
+{
+        return (col * N + row);
+}
+{% endhighlight %}
+
+
+### Restrict Keyword
+
+Use of restrict keyword in the last argument of the following function tells the compiler  that only pointer `C` has the exclusive right to the memory pointed by it. 
+
+Therefore if one modifies the memory by accessing either pointer `A` or pointer `B`, one can still safely assume that memory referenced by the pointer `C` remains unchanged. Therefore C compiler can optimize the code by potentially reducing the number of reads from pointer `C`.   
+
+{% highlight C %}
+void dgemm(int lda, double* A, double* B, double* restrict C);
+{% endhighlight %}
+
+### Order of Loop Iterations
+
+In this section, we shall study various algorithms to compute the matrix product while gradually improving upon them. First, let us look at the following naively written code
+
+{% highlight C %}
+for(int i = 0; i < N; ++i)
+        for(int j = 0; j < N; ++j)
+        {       
+                double val = 0;
+
+                for(int k = 0; k < N; ++k)
+                        val += A[array_idx(N, i, k)] * B[array_idx(N, k, j)];
+
+                C[array_idx(N, i, j)] = val;
+        }
+{% endhighlight %}
+
+In the code above, innermost loop increments the variable `k` after every iteration i.e. instructions are executed in the following order
+{% highlight C %}
+val += A[k * N + i] * B[j * N + k];
+val += A[k * N + N + i] * B[j * N + k + 1];
+val += A[k * N + 2 * N + i] * B[j * N + k + 2];
+{% endhighlight %}
+
+Thus if the dimension `N` of matrix is large enough then succesive access of memory pointed by the pointer `A` will lead to frequent cache miss. On the other hand if we iterate the innermost loop with respect to the variable `i` i.e. 
+{% highlight C %}
+for(int i = 0; i < N; ++i)
+        val += A[array_idx(N, i, k)] * B[array_idx(N, k, j)];
+{% endhighlight %}
+
+then the sequence of successive operations will look like the following
+{% highlight C %}
+val += A[k * N + i] * B[j * N + k];
+val += A[k * N + i + 1] * B[j * N + k];
+val += A[k * N + i + 2] * B[j * N + k + 2];
+{% endhighlight %}
+
+which is clearly much more cache-friendly.
+
+### Loop Unrolling
+
+
+
+
+
+
