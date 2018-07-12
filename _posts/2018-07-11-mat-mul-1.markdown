@@ -69,6 +69,7 @@ which is clearly much more cache-friendly.
 
 ### Loop Unrolling
 
+Unwinding the loop a bit would reduce the number of instructions (end of loop test, counter arithmetic, etc.) albeit at the cost of space. 
 
 
 
