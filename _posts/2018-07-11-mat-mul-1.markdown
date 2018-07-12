@@ -6,9 +6,21 @@ permalink: /matmul-1
 author: "Alok Bakshi"
 ---
 
-### Matrices in C
+## Introduction
 
-In C language, one can store matrices in either row or column major formats. For example, the following code below retrieves `(row, col)` element of `N` by `N` matrix stored in column major format
+Given three square matrices `A`, `B`, and `C` each of dimension `N` we will concern ourselves with
+the implementation of following matrix operation (officially known as dgemm routine)
+{% highlight c %}
+C = C + A B
+{% endhighlight %}
+
+The purpose of this article is to discuss various optimization techniques one could employ to speed up the above computation. Note that even though the code [implemented here](https://github.com/alokbakshi/Matrix-Multiplication) performs much better than the straightforward naive implementation but still it is nowhere close to being as efficient as the code implemented in the standard Math libraries (Intel MKL, for example). 
+
+Without further ado, let us go through the relevant concepts.
+
+### Matrix Representation in C
+
+In C language, one can store matrices in either row or column major formats. For example, the following code below retrieves `(row, col)` element of `N` by `N` matrix stored in the column major format
 
 {% highlight c %}
 inline int array_idx(int N, int row, int col)
@@ -17,16 +29,19 @@ inline int array_idx(int N, int row, int col)
 }
 {% endhighlight %}
 
+One can notice that if matrix is stored in column manjor format then reading the matrix while iterating through the row is more efficient than while iterating through the column (vice versa for matrices stored in the row major format). This follows from the performance gains out of [spatial locality](https://en.wikipedia.org/wiki/Locality_of_reference).  
+
 
 ### Restrict Keyword
 
-Use of restrict keyword in the last argument of the following function tells the compiler  that only pointer `C` has the exclusive right to the memory pointed by it. 
+The dgemm function is declared as follows
+{% highlight C %}
+void dgemm(int N, double* A, double* B, double* restrict C);
+{% endhighlight %}
+
+Use of `restrict` keyword in the last argument of the above function informs the compiler that only pointer `C` has the exclusive right to the memory pointed by it. 
 
 Therefore if one modifies the memory by accessing either pointer `A` or pointer `B`, one can still safely assume that memory referenced by the pointer `C` remains unchanged. Therefore C compiler can optimize the code by potentially reducing the number of reads from pointer `C`.   
-
-{% highlight C %}
-void dgemm(int lda, double* A, double* B, double* restrict C);
-{% endhighlight %}
 
 ### Order of Loop Iterations
 
@@ -36,7 +51,7 @@ In this section, we shall study various algorithms to compute the matrix product
 for(int i = 0; i < N; ++i)
         for(int j = 0; j < N; ++j)
         {       
-                double val = 0;
+                double val = C[array_idx(N, i, j)];
 
                 for(int k = 0; k < N; ++k)
                         val += A[array_idx(N, i, k)] * B[array_idx(N, k, j)];
@@ -52,7 +67,7 @@ val += A[k * N + N + i] * B[j * N + k + 1];
 val += A[k * N + 2 * N + i] * B[j * N + k + 2];
 {% endhighlight %}
 
-Thus if the dimension `N` of matrix is large enough then succesive access of memory pointed by the pointer `A` will lead to frequent cache miss. On the other hand if we iterate the innermost loop with respect to the variable `i` i.e. 
+Thus if the dimension `N` of matrix is large enough then succesive access of memory pointed by the pointer `A` will lead to frequent cache misses. On the other hand if we iterate the innermost loop with respect to the variable `i` i.e. 
 {% highlight C %}
 for(int i = 0; i < N; ++i)
         val += A[array_idx(N, i, k)] * B[array_idx(N, k, j)];
@@ -65,13 +80,97 @@ val += A[k * N + i + 1] * B[j * N + k];
 val += A[k * N + i + 2] * B[j * N + k + 2];
 {% endhighlight %}
 
-which is clearly much more cache-friendly.
+which is more cache-friendly and leads to better performance.
+
+### Blocking
+
+Assume for the time being that dimension of matrix `N` is particularly large and the outermost loop is iterated with respect to the variable `k`. Then after every iteration of outermost loop, elements from array `A` are accessed in the following order
+{% highlight C %}
+val += A[k * N + i] * B[j * N + k];
+val += A[k * N + N + i] * B[j * N + k + 1];
+val += A[k * N + 2 * N + i] * B[j * N + k + 2];
+{% endhighlight %}
+
+During the first iteration when the value `A[k * N + i]` is fetched from the main memory then the cache memory also collects  `A[k * N + i],  A[k * N + i + 1],  A[k * N + 2], ...`. But as can be seen from the code above all these fetched values are wasted as cache size is limited and for larger matrices the next read  `A[k * N + N + i]` won't be in the cache memory. This problem will persist no matter which variable the outermost loop is iterated against!
+
+In order to alleviate it, one can use blocking where each matrix is divided into smaller sub-matrices. Each submatrix can be refrenced multiple times before moving to the next submatrix thus (by virtue of temporal locality) improving the performance.
+
+For example, in the above code the blocked iteration would be
+
+{% highlight C %}
+
+/* Block sizes for each variable */
+int I_BLOCK_SIZE, J_BLOCK_SIZE, K_BLOCK_SIZE; 
+
+for(int i_b = 0; i_b < N; i_b += I_BLOCK_SIZE)
+        for(int j_b = 0; j_b < N; j_b += J_BLOCK_SIZE)
+                for(int k_b = 0; k_b < N; k_b += K_BLOCK_SIZE)
+                {
+                        /* Having smaller-sized blocks of matrices, we iterate next element by element */
+
+                        const int i_lim = min(N, i_b + I_BLOCK_SIZE);
+                        const int j_lim = min(N, j_b + J_BLOCK_SIZE);
+                        const int k_lim = min(N, k_b + K_BLOCK_SIZE);
+
+                        for(int i = i_b; i < i_lim; ++i)
+                                for(int j = j_b; j < j_lim; ++j)
+                                        for(int k = k_b; k < k_lim; ++k)
+                                                /* Computations go here */
+                }
+
+{% endhighlight %}
+
+Since there are usually multiple levels of cache memory so one can correspondingly explore multiple levels of blocking as well. 
 
 ### Loop Unrolling
 
-Unwinding the loop a bit would reduce the number of instructions (end of loop test, counter arithmetic, etc.) albeit at the cost of space. 
+Unwinding the loop a bit would reduce the number of instructions (end of loop test, counter arithmetic, etc.) albeit at the cost of extra space. Getting back to the example above and assuming that `N` is even, the unrolled version with `unrolling_factor = 2` is:
+{% highlight C %}
+for(int i = 0; i < N; i += 2)
+{
+        val += A[array_idx(N, i + 0, k)] * B[array_idx(N, k, j)];
+        val += A[array_idx(N, i + 1, k)] * B[array_idx(N, k, j)];
+}
+{% endhighlight %}
 
+Apart from that, unrolling sometimes makes it obvious that consecutive instructions are independent of each other and therefore can be potentially executed simultaneously by the CPU.
 
+### SIMD Instructions
 
+At the cost of code portability, one can directly use assembly code to use processor specific vector instructions (In my opinion, a better option will be to use appropriate compiler flag e.g. with GNU C compiler one can type `gcc -O3 -march=native fileName.c` in command prompt.)
 
+One can manually code vector instructions. The necessary function declarations are included in the header file `immintrin.h`. 
 
+Advanced Vector Extensions (abbreiviated as AVX) are extensions to Intel x86 instruction set architecture which deal with 256 bit register. AVX2 supportes the same (and more instructions of "fused multiply and add" type) instructions for 512 bit registers. In this section, we will implicitly assume that the hardware supports AVX2 instructions. 
+
+For definiteness, let us restrict our attention to the following instructions below
+{% highlight C %}
+/* Pointers to three arrays, each assumed to have at least eight elements */
+double *A, *B, *C; 
+
+/* 512 bit registers a, b and c each store 512 / 64 = 8 double values
+   i.e. a <- A[0 ... 7], b <- B[0 ... 7], and c <- C[0 ... 7] */
+
+__m512d a =  _mm512_load_pd(A);
+__m512d b =  _mm512_load_pd(B);
+__m512d c =  _mm512_load_pd(C);
+
+/* all values stored inside the register c are simultaneously transformed as
+   c[i] <- c[i] + a[i] * b[i]  for 0 <= i < 8 */
+
+c = _mm512_fmadd_pd(a, b, c);
+
+/* Store the values insider the register c to the array C */
+_mm512_store_pd(C, c) ;
+										
+{% endhighlight  %}
+
+In the code written above eight "fused multiply and add" operations are done simultaneously in one operation thus saving the clock cycles.
+
+### Performance and Concluding Remark
+
+Running the code on ACI machine (available at Penn State University), the performance (proportion of sustained performance to peak performance) of the implemented code hovered around `65 – 70 %` for moderately sized matrices `(N <= 480)`, while for matrices of much larger dimensions the performance dropped down to around `40 %`.
+
+In the (mythical?) second post I will write about other techniques one can employ to make the code more efficient. In the meantime, currently I'm learning the relevant topics from this [reference paper](http://spiral.ece.cmu.edu:8080/pub-spiral/pubfile/paper_100.pdf). 
+
+Finally, I want to thank Prof. Adam Lavely, Christopher Blanton, and Chuck Pavloski who helped me in learning the above material while teaching "Application of Parallel Computing" course at the Penn State University.
