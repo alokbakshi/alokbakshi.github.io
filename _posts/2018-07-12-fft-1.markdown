@@ -133,3 +133,136 @@ $$
 $$
 
 
+### Implementation in C
+
+First one notes that upto complex conjugation (flip of sign in imaginary part of primitive root) and scaling factor both FFT and inverse FFT routines are same. So one can build helper function (named `fft_h` in code) which is common to both of these functions.
+
+{% highlight C %}
+/* size is assumed to be the power of 2 */
+void fft(double* restrict output_re, double* restrict output_img,
+	       const double* input_re,	const double* input_img, int size)
+{
+	fft_h(output_re, output_img, input_re, input_img, size, 1);
+}
+
+/* size is assumed to be the power of 2 */
+void inv_fft(double* restrict output_re, double* restrict output_img,
+	       const double* input_re,	const double* input_img, int size)
+{
+	fft_h(output_re, output_img, input_re, input_img, size, - 1);
+
+
+	for(int idx = 0; idx < size; ++idx)
+	{
+		output_re[idx] /= size;
+		output_img[idx] /= size;
+	}
+}
+{% endhighlight %}
+
+Next, for `fft_h` function, the boundary case for `size = 1` is dealt with as follows
+
+{% highlight C %}
+void fft_h(double* restrict output_re, double* restrict output_img,
+	       const double* input_re,	const double* input_img, int size, int sign)
+{
+	/* Deal with the boundary case first */
+	if(size == 1)
+	{
+		output_re[0] = input_re[0];
+		output_img[0] = input_img[0];
+		return;
+	}
+
+    /* ... Rest of the code */
+}
+{% endhighlight %}
+
+For the sake of simplicity (and to assist in parallelization, which will be the topic of next post) we will make separate copies of inputs and output for the next recursive call. Doing so will only use double $$ 1 + 2 + 4 + \ldots + 2^{N - 1} = 2^N - 1 $$ the amount of memory required to store input variables. 
+
+{% highlight C %}
+
+int h_size = (size / 2);
+	
+double* buf_mem = (double*) malloc( 4 * size * sizeof(double) );
+	
+double* input_ev_re = buf_mem;
+double* input_ev_img = buf_mem + h_size;
+
+double* input_odd_re = buf_mem + 2 * h_size;
+double* input_odd_img = buf_mem + 3 * h_size;
+
+double* output_ev_re = buf_mem + 4 * h_size;
+double* output_ev_img = buf_mem + 5 * h_size; 
+
+double* output_odd_re = buf_mem + 6 * h_size;
+double* output_odd_img = buf_mem + 7 * h_size;
+
+
+/* Copy the original input and output to the inputs 
+	and outputs for the next recursive calls */
+
+for(int idx = 0; idx < h_size; ++idx)
+{
+	int d_idx = (idx << 1);
+		
+	input_ev_re[idx] = input_re[d_idx];
+	input_ev_img[idx] = input_img[d_idx];
+
+	input_odd_re[idx] = input_re[d_idx + 1];
+	input_odd_img[idx] = input_img[d_idx + 1];
+}
+
+/* ... Rest of the code ... */
+
+free(buf_mem);
+
+{% endhighlight %}
+
+Next, goes the recursive calls (which can run independent to each other)
+
+{% highlight C %}
+fft_h(output_ev_re, output_ev_img, input_ev_re, 
+		input_ev_img, h_size, sign);
+
+fft_h(output_odd_re, output_odd_img, input_odd_re,
+		input_odd_img, h_size, sign);
+{% endhighlight %}
+
+Rest of the code assembles output from the outputs of recursive calls. It involves adding those up weighted by the power of primitive root. In general for FFT, one can choose any primitive root of unity one likes but for inverse FFT it should exactly be the complex conjugate of the previously chosen root. Keeping this in mind, below is the code to generate final output
+
+{% highlight C %}
+double angle = (2 * PI) / size;
+	
+double prim_root_re = cos(angle);
+double prim_root_img = sign * sin(angle); /* sign = 1: FFT and  -1: Inverse FFT */
+
+/* factor variable carries the integer power of primitive root  
+	at iteration i of loop below factor = (primitive root) ^ i */
+
+double factor_re = 1.0;
+double factor_img = 0.0;
+
+for(int idx = 0; idx < h_size; ++idx)
+{
+	double s_re = factor_re * output_odd_re[idx] - factor_img * output_odd_img[idx];
+	double s_img = factor_re * output_odd_img[idx] + factor_img * output_odd_re[idx];
+	
+	output_re[idx] = output_ev_re[idx] + s_re; 
+	output_img[idx] = output_ev_img[idx] + s_img;
+		
+	output_re[h_size + idx] = output_ev_re[idx] - s_re;
+	output_img[h_size + idx] = output_ev_img[idx] - s_img;
+
+		
+	double t0 = factor_re * prim_root_re - factor_img * prim_root_img;
+	double t1 = factor_img * prim_root_re + factor_re * prim_root_img;
+		
+	factor_re = t0;
+	factor_img = t1;
+}
+{% endhighlight %}
+
+### Future Work
+
+So far we have only dealt with the case of taking FFT where the input size `N` is a power of two. In the next post, we shall look at the more general case. Moreover we shall see how the code above can be parallelized (in either of OpenMP, MPI and CUDA frameworks). There is ample opportunity for "instruction level parallelization" as many of the instructions inside the loop can be run simultaneously. We shall ponder over all of these issues in the next post. 
