@@ -29,7 +29,7 @@ inline int array_idx(int N, int row, int col)
 }
 {% endhighlight %}
 
-One can notice that if matrix is stored in column manjor format then reading the matrix while iterating through the row is more efficient than while iterating through the column (vice versa for matrices stored in the row major format). This follows from the performance gains out of [spatial locality](https://en.wikipedia.org/wiki/Locality_of_reference).  
+One can notice that if matrix is stored in column major format then scanning the matrix while iterating through the column is more efficient than scanning it by iterating through the row (vice versa for matrices stored in the row major format). This follows from the performance gains out of [spatial locality](https://en.wikipedia.org/wiki/Locality_of_reference).  
 
 
 ### Restrict Keyword

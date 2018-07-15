@@ -111,7 +111,7 @@ On the other hand for $$ N = 2 $$ by definition we have
 
 $$
 \mathbb{F}_2 = \begin{pmatrix}\mathbb{I}_{1} &  \mathbb{D}_{1} \\ \mathbb{I}_{1} & - \mathbb{D}_{1} \end{pmatrix} \begin{pmatrix} \mathbb{F}_{1} & 0 \\ 0 & \mathbb{F}_{1} \end{pmatrix} \mathbb{S}_2
-= \begin{pmatrix} 1 & 1 \\ 1 & - 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
+= \begin{pmatrix} 1 & 1 \\ 1 & - 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} =  \begin{pmatrix} 1 & 1 \\ 1 & - 1 \end{pmatrix}
 $$
 
 Thus for the record, given an input $$ (a, b) $$ the output would be
@@ -239,8 +239,8 @@ double angle = (2 * PI) / size;
 double prim_root_re = cos(angle);
 double prim_root_img = sign * sin(angle); /* sign = 1: FFT and  -1: Inverse FFT */
 
-/* factor variable carries the integer power of primitive root  
-	at iteration i of loop below factor = (primitive root) ^ i */
+/* factor variable carries the integer power of primitive root.  
+	At iteration i of loop below factor = (primitive root) ^ i */
 
 double factor_re = 1.0;
 double factor_img = 0.0;
