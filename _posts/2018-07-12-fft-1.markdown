@@ -15,18 +15,18 @@ Let us first define the *Discrete Fourier Transformation* (abbreviated as DFT) a
 Given a sequence of \\( N \\) complex numbers, namely $$ X_N = (x_n)_{n=0}^{N-1} $$ its discrete Fourier transformation $$ Y_N = (y_m)_{m=0}^{N-1} $$ is defined by the following rule
 
 $$
-\displaystyle y_m = \sum_{n=0}^{N - 1} x_n \ \exp\left(\frac{2 \pi \imath}{N} \, m n\right) \ \ \ \forall \ 0 \leq m \leq N - 1
+\displaystyle y_m = \sum_{n=0}^{N - 1} x_n \ \exp\left(\frac{2 \pi i}{N} \, m n\right) \ \ \ \forall \ 0 \leq m \leq N - 1
 $$
 
 Moreover the inverse of above map (called inverse discrete Fourier transform) is defined as
 
 $$
-\displaystyle x_n = \frac{1}{N} \sum_{m=0}^{N - 1} y_m \ \exp\left(- \frac{2 \pi \imath}{N} \, m n \right) \ \ \ \forall \ 0 \leq n \leq N - 1
+\displaystyle x_n = \frac{1}{N} \sum_{m=0}^{N - 1} y_m \ \exp\left(- \frac{2 \pi i}{N} \, m n \right) \ \ \ \forall \ 0 \leq n \leq N - 1
 $$
 
 
 Let $$ \mathbb{F}_N $$ denote the $$ N \times N $$ matrix whose $$ (m, n) $$ entry is given by $$
-\displaystyle \left( \mathbb{F}_N \right)_{(m, n)} = \exp\left(\frac{2 \pi \imath}{N} \, m n \right)$$ then the above rule can be succintly expressed as the following matrix vector multiplication
+\displaystyle \left( \mathbb{F}_N \right)_{(m, n)} = \exp\left(\frac{2 \pi i}{N} \, m n \right)$$ then the above rule can be succintly expressed as the following matrix vector multiplication
 
 $$
 \displaystyle Y_N = \mathbb{F}_N \, X_N
@@ -82,10 +82,10 @@ Fourier transformation $$ Y_4 = \mathbb{F}_4 \ X_4 = (y_0, y_1, y_2, y_3) $$ by 
 
 $$
 \begin{align*}
-y_0 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi \imath}{4} 0 \cdot n \right) = x_0 + x_1 + x_2 + x_3 \\
-y_1 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi \imath}{4} 1 \cdot n \right) = x_0 + \imath x_1 - x_2 - \imath x_3 \\
-y_2 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi \imath}{4} 2 \cdot n \right) = x_0 - x_1 + x_2 - x_3 \\
-y_3 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi \imath}{4} 3 \cdot n \right) = x_0 - \imath x_1 -  x_2 + \imath x_3 
+y_0 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi i}{4} 0 \cdot n \right) = x_0 + x_1 + x_2 + x_3 \\
+y_1 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi i}{4} 1 \cdot n \right) = x_0 + i x_1 - x_2 - i x_3 \\
+y_2 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi i}{4} 2 \cdot n \right) = x_0 - x_1 + x_2 - x_3 \\
+y_3 &= \sum_{n = 0}^3 x_n \ \exp\left( \frac{2 \pi i}{4} 3 \cdot n \right) = x_0 - i x_1 -  x_2 + i x_3 
 \end{align*}
 $$
 
@@ -93,10 +93,10 @@ Moreover the inverse discrete Fourier transform is given as
 
 $$
 \begin{align*}
-x_0 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi \imath}{4} 0 \cdot m \right) = \frac{1}{4}\left( y_0 + y_1 + y_2 + y_3 \right) \\
-x_1 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi \imath}{4} 1 \cdot m \right) = \frac{1}{4} \left( y_0 - \imath y_1 - y_2 + \imath y_3 \right) \\
-x_2 &= \frac{1}{4}\sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi \imath}{4} 2 \cdot m \right) = \frac{1}{4} \left( y_0 - y_1 + y_2 - y_3 \right) \\
-x_3 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi \imath}{4} 3 \cdot m \right) = \frac{1}{4} \left( y_0 + \imath y_1 - y_2 - \imath y_3 \right)
+x_0 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi i}{4} 0 \cdot m \right) = \frac{1}{4}\left( y_0 + y_1 + y_2 + y_3 \right) \\
+x_1 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi i}{4} 1 \cdot m \right) = \frac{1}{4} \left( y_0 - i y_1 - y_2 + i y_3 \right) \\
+x_2 &= \frac{1}{4}\sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi i}{4} 2 \cdot m \right) = \frac{1}{4} \left( y_0 - y_1 + y_2 - y_3 \right) \\
+x_3 &= \frac{1}{4} \sum_{m = 0}^3 y_m \ \exp\left( - \frac{2 \pi i}{4} 3 \cdot m \right) = \frac{1}{4} \left( y_0 + i y_1 - y_2 - i y_3 \right)
 \end{align*}
 $$
 
@@ -121,7 +121,7 @@ Getting back to the problem, we have
 $$
 \begin{align*}
 \begin{pmatrix} y_0 \\ y_1 \\ y_2 \\ y_3 \end{pmatrix} &= \mathbb{F}_4 \begin{pmatrix} x_0 \\ x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix}\mathbb{I}_{2} &  \mathbb{D}_{2} \\ \mathbb{I}_{2} & - \mathbb{D}_{2} \end{pmatrix} \begin{pmatrix} \mathbb{F}_{2} & 0 \\ 0 & \mathbb{F}_{2} \end{pmatrix} \mathbb{S}_4 \begin{pmatrix} x_0 \\ x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix}\mathbb{I}_{2} &  \mathbb{D}_{2} \\ \mathbb{I}_{2} & - \mathbb{D}_{2} \end{pmatrix} \begin{pmatrix} \mathbb{F}_{2} & 0 \\ 0 & \mathbb{F}_{2} \end{pmatrix} \begin{pmatrix} x_0 \\ x_2 \\ x_1 \\ x_3 \end{pmatrix} \\
-&= \begin{pmatrix} \mathbb{I}_{2} & \mathbb{D}_{2} \\ \mathbb{I}_{2} & - \mathbb{D}_{2} \end{pmatrix} \begin{pmatrix} \mathbb{F}_2 \begin{pmatrix} x_0 \\ x_2 \end{pmatrix} \\ \mathbb{F}_2 \begin{pmatrix} x_1 \\ x_3 \end{pmatrix} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & \imath \\ 1 & 0 & -1 & 0 \\ 0 & 1 & 0 & -\imath \end{pmatrix} \begin{pmatrix} x_0 + x_2 \\ x_0 - x_2 \\ x_1 + x_3 \\ x_1 - x_3 \end{pmatrix} = \begin{pmatrix} x_0 + x_1 + x_2 + x_3 \\ x_0 + \imath x_1 - x_2 - \imath x_3 \\ x_0 - x_1 + x_2 - x_3 \\ x_0 - \imath x_1 -  x_2 + \imath x_3  
+&= \begin{pmatrix} \mathbb{I}_{2} & \mathbb{D}_{2} \\ \mathbb{I}_{2} & - \mathbb{D}_{2} \end{pmatrix} \begin{pmatrix} \mathbb{F}_2 \begin{pmatrix} x_0 \\ x_2 \end{pmatrix} \\ \mathbb{F}_2 \begin{pmatrix} x_1 \\ x_3 \end{pmatrix} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & i \\ 1 & 0 & -1 & 0 \\ 0 & 1 & 0 & -i \end{pmatrix} \begin{pmatrix} x_0 + x_2 \\ x_0 - x_2 \\ x_1 + x_3 \\ x_1 - x_3 \end{pmatrix} = \begin{pmatrix} x_0 + x_1 + x_2 + x_3 \\ x_0 + i x_1 - x_2 - i x_3 \\ x_0 - x_1 + x_2 - x_3 \\ x_0 - i x_1 -  x_2 + i x_3  
 \end{pmatrix}
 \end{align*}
 $$
@@ -129,6 +129,7 @@ $$
 For the case of inverse transform similarly we have
 
 $$
-\begin{pmatrix} x_0 \\ x_1 \\ x_2 \\ x_3 \end{pmatrix} = \mathbb{F}^{-1}_4 \begin{pmatrix} y_0 \\ y_1 \\ y_2 \\ y_3 \end{pmatrix} = \frac{1}{4} \, \overline{\mathbb{F}_4} \begin{pmatrix} y_0 \\ y_1 \\ y_2 \\ y_3 \end{pmatrix} = \frac{1}{4} \begin{pmatrix} 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & - \imath \\ 1 & 0 & -1 & 0 \\ 0 & 1 & 0 & \imath \end{pmatrix} \begin{pmatrix} y_0 + y_2 \\ y_0 - y_2 \\ y_1 + y_3 \\ y_1 - y_3 \end{pmatrix} = \frac{1}{4} \begin{pmatrix} y_0 + y_1 + y_2 + y_3 \\ y_0 - \imath y_1 - y_2 + \imath y_3 \\ y_0 - y_1 + y_2 - y_3 \\ y_0 + \imath y_1 - y_2 - \imath y_3 \end{pmatrix}
+\begin{pmatrix} x_0 \\ x_1 \\ x_2 \\ x_3 \end{pmatrix} = \mathbb{F}^{-1}_4 \begin{pmatrix} y_0 \\ y_1 \\ y_2 \\ y_3 \end{pmatrix} = \frac{1}{4} \, \overline{\mathbb{F}_4} \begin{pmatrix} y_0 \\ y_1 \\ y_2 \\ y_3 \end{pmatrix} = \frac{1}{4} \begin{pmatrix} 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & - i \\ 1 & 0 & -1 & 0 \\ 0 & 1 & 0 & i \end{pmatrix} \begin{pmatrix} y_0 + y_2 \\ y_0 - y_2 \\ y_1 + y_3 \\ y_1 - y_3 \end{pmatrix} = \frac{1}{4} \begin{pmatrix} y_0 + y_1 + y_2 + y_3 \\ y_0 - i y_1 - y_2 + i y_3 \\ y_0 - y_1 + y_2 - y_3 \\ y_0 + i y_1 - y_2 - i y_3 \end{pmatrix}
 $$
+
 

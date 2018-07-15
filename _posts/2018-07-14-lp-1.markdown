@@ -1,0 +1,47 @@
+---
+layout: post
+title:  Linear Programming - 1
+date:   2018-07-12 
+permalink: /lp-1
+author: "Alok Bakshi"
+---
+
+
+
+One of the simplest class of Mathematical optimization problems is *Linear Programs* (henceforth abbreviated as LP ) which have lots of [applications](https://en.wikipedia.org/wiki/Linear_programming#Uses) in modeling real life problems.
+
+In this post (and the future ones) I will try to explain the naive procedure of solving a Linear Programs (A custom implementation of which is made [here](https://github.com/alokbakshi/Linear-Program-Solver).
+
+Without further ado, mathematical formulation of LP is written below
+
+$$
+
+\begin{align*}
+
+\mbox{Maximize} \sum_{i=1}^n c_i x_i \\
+
+\mbox{subjected to} \\
+
+\sum_{i = 1}^n a_{i j} x_i = b_j \ \ \ \forall 1 \leq j \leq m \\
+
+x_i \geq 0 \ \ \ \forall 1 \leq i \leq n
+
+\end{align*}
+
+$$
+
+In the above formulation, there are `n` variables and `m` constraints. For intuition we can assume the following:
+<ul>
+	<li>$latex n > m$ and each of the $latex m$ constraints are linearly independent.</li>
+	<li>$latex b_j \geq 0$ for all $latex j \in \left\{ 1, 2, \ldots, m\right\}$</li>
+	<li>LP formulation above is bounded i.e. it has a finite solution</li>
+</ul>
+Under these assumptions, there is a unique optimal value (and potentially several optimal solutions) of the above problem. [Simplex method](https://en.wikipedia.org/wiki/Simplex_algorithm) -- and variants thereof -- is one of the most popular algorithm to solve the above problem.
+
+Intuitively speaking, we first choose `n-m` variables and assign them the zero value (called non basic variables). Thereafter the remaining `m` variables (called basic variables) can be computed by solving the $$ m \times m $$ system of equations.
+
+Thus we have two separate sets of basic and non basic variables. Now one checks that if one can improve the solution by making a single exchange between the set of "non basic variables" and "basic variables." If it is not possible then we have arrived at the optimal solution otherwise one simply repeats the above procedure.
+
+Theoretically speaking, in worst case scenario one need to make $$ \binom{n}{m} $$ many iterations but in practice the above algorithm runs much faster and performs even better than provably efficient (polynomial time) [algorithms](https://en.wikipedia.org/wiki/Karmarkar%27s_algorithm).
+
+We will now work out a concrete example explaining the logic behind the Simplex Tableaux algorithm.
