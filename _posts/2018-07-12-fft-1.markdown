@@ -34,9 +34,9 @@ $$
 
 ### Fast Fourier Transformation
 
-Looking at the equation above one can see that straightforward calculation will require $$O(N^2)$$ computations to calculate $$ Y_N $$.  *Fast Fourier Transformation* (abbreviated as FFT) is an $$ O(N \log(N)) $$ algorithm to compute the same.
+Looking at the equation above one can see that straightforward calculation will require $$O(N^2)$$ computations to calculate $$ Y_N $$.  *Fast Fourier Transformation* (abbreviated as FFT) is an $$ O(N \log N ) $$ algorithm to compute the same.
 
-From now (without loss of generality) we will make an assumption that $$ N $$ is a power of two. If that is not the case one can simply pad the input vector $$ X_N $$ with required number of zeros at the end. Doing that will at most double the input size so the complexity of FFT algorithm won't change.
+From now (without loss of generality) we will make an assumption that $$ N $$ is a power of two. If that is not the case, one can simply pad the input vector $$ X_N $$ with required number of zeros at the end. Doing that will at most double the input size so that the complexity of FFT algorithm will not be affected.
 
 Even though  the matrix $$ \mathbb{F}_N $$ is far from being sparse, yet we can exploit the special structure it possesses. Namely, 
 
@@ -62,7 +62,10 @@ $$
 \mathbb{S}_4 = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{pmatrix} \ \ \mbox{ and in general } \ \ \mathbb{S}_N = \begin{pmatrix} \mathbf{e}_0 \\ \mathbf{e}_2 \\ \ldots \\ \mathbf{e}_{N} \\ \mathbf{e}_1 \\ \mathbf{e}_3 \\ \ldots \\ \mathbf{e}_{N - 1} \end{pmatrix}
 $$
 
-Moreover the inverse fourier transform can be obtained by recognizing that $$ \frac{1}{\sqrt{N}} \mathbb{F}_N $$ is a unitary and symmetric matrix, in other words
+If we recursively factorize the matrix $$ \mathbb{F}_N $$ as above then there will be $$ O(\log N ) $$ many matrix products where each matrix would have at most *two* non zero entries in each row. Thus if one computes the product successively from the right then each matrix-vector product would take $$ O(N) $$ time. Thus all in all whole algorithm computes the required product in $$ O(N \log N ) $$ time.  
+
+
+Furthermore the inverse fourier transform can be obtained by recognizing that $$ \frac{1}{\sqrt{N}} \mathbb{F}_N $$ is a unitary and symmetric matrix, in other words
 
 $$
 \mathbb{F}^{-1}_N = \frac{1}{N} \ \overline{\mathbb{F}_N} 
@@ -199,8 +202,7 @@ double* output_odd_re = buf_mem + 6 * h_size;
 double* output_odd_img = buf_mem + 7 * h_size;
 
 
-/* Copy the original input and output to the inputs 
-	and outputs for the next recursive calls */
+/* Copy the original input to the inputs for the next recursive calls */
 
 for(int idx = 0; idx < h_size; ++idx)
 {
