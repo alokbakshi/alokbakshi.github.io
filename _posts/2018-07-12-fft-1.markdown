@@ -221,7 +221,7 @@ free(buf_mem);
 
 {% endhighlight %}
 
-Next, goes the recursive calls (which can run independent to each other)
+Next, goes the recursive calls (which can run independent of each other)
 
 {% highlight C %}
 fft_h(output_ev_re, output_ev_img, input_ev_re, 
