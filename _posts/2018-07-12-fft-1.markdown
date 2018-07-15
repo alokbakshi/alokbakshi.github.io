@@ -44,7 +44,7 @@ $$
 \displaystyle \mathbb{F}_N = \begin{pmatrix}\mathbb{I}_{\frac{N}{2}} &  \mathbb{D}_{\frac{N}{2}} \\ \mathbb{I}_{\frac{N}{2}} & - \mathbb{D}_{\frac{N}{2}} \end{pmatrix} \begin{pmatrix} \mathbb{F}_{\frac{N}{2}} & 0 \\ 0 & \mathbb{F}_{\frac{N}{2}} \end{pmatrix} \mathbb{S}_N 
 $$
 
-Here $$ \mathbb{D}_N $$ is a diagonal matrix defined as
+Here $$ \mathbb{I}_{\frac{N}{2}} $$ is the identity matrix and $$ \mathbb{D}_N $$ is a diagonal matrix defined as
 
 $$ \mathbb{D}_N = \begin{pmatrix}
     
