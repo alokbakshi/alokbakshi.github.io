@@ -31,11 +31,11 @@ x_i \geq 0 \ \ \ \forall 1 \leq i \leq n
 $$
 
 In the above formulation, there are `n` variables and `m` constraints. For intuition we can assume the following:
-<ul>
-	<li>$latex n > m$ and each of the $latex m$ constraints are linearly independent.</li>
-	<li>$latex b_j \geq 0$ for all $latex j \in \left\{ 1, 2, \ldots, m\right\}$</li>
-	<li>LP formulation above is bounded i.e. it has a finite solution</li>
-</ul>
+
+* $$ n > m $$ and each of the $$ m $$ constraints are linearly independent
+* $$ b_j \geq 0 $$ for all $$ j \in \left\{ 1, 2, \ldots, m\right\} $$
+* LP formulation above is bounded i.e. it has a finite solution
+
 Under these assumptions, there is a unique optimal value (and potentially several optimal solutions) of the above problem. [Simplex method](https://en.wikipedia.org/wiki/Simplex_algorithm) -- and variants thereof -- is one of the most popular algorithm to solve the above problem.
 
 Intuitively speaking, we first choose `n-m` variables and assign them the zero value (called non basic variables). Thereafter the remaining `m` variables (called basic variables) can be computed by solving the $$ m \times m $$ system of equations.

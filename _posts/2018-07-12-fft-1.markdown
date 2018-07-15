@@ -50,7 +50,7 @@ $$ \mathbb{D}_N = \begin{pmatrix}
     
     1 & & & & \\
     & \omega_N & & & \\
-    & & \omega_N & & \\
+    & & \omega_N^2 & & \\
     & & & \ddots &  \\
     & & & & \omega_N^{N - 1}
 
