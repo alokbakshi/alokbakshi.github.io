@@ -10,6 +10,7 @@ author: "Alok Bakshi"
 
 Given three square matrices `A`, `B`, and `C` each of dimension `N` we will concern ourselves with
 the implementation of following matrix operation (officially known as dgemm routine)
+
 {% highlight c %}
 C = C + A B
 {% endhighlight %}

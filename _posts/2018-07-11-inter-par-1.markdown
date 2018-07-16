@@ -50,4 +50,4 @@ In order to correctly calculate the force on boundary particles each processor n
 Finally, in my code I've used unsynchronized send and receive routines so as to avoid the deadlock problem and to get better efficiency (as unsynchronized send/receive and computations can be run in parallel). The only caveat is that one needs to be careful to use MPI wait routine before accessing any of the sent data.
 
 
-(to be continued ...) 
+( to be continued ... ) 
