@@ -67,8 +67,8 @@ $$
 
 For clarity, we first make sure that none of the above two conditions arise. This can be ensured by making the following assumptions:
 
-* $$ b_j \geq 0 $$ for all $$ j \in \left\{ 1, 2, \ldots, m\right\} $$
-* Solution space of LP formulation above is bounded from above.
+* $$ b_j \geq 0 $$ for all $$ j \in \left\{ 1, 2, \ldots, m\right\} $$. This ensures that there is at least one solution, namely $$ \mathbf{x} = (0, 0, \ldots, 0)$$.
+* For all those variables $$ x_i : 1 \leq i \leq n$$ for which, $$ c_i \neq 0 $$ there exists a constraint $$ j : 1 \leq j \leq m $$ such that $$ a_{i j} \cdot c_i > 0 $$. It esnures that all of the variables $$ x_i $$ remain bounded and therefore so does the optimal value. 
 
 Under these assumptions, there is an unique optimal value (and potentially several optimal solutions) of the above problem. [Simplex method](https://en.wikipedia.org/wiki/Simplex_algorithm) -- and variants thereof -- is one of the most popular algorithm to solve the above problem and in rest of the post we shall learn the basics behind this method.
 
