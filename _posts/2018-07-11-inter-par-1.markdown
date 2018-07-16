@@ -2,7 +2,7 @@
 layout: post
 title:  Interacting Particle Simulation - 1
 date:   2018-07-16 
-permalink: /matmul-1
+permalink: /interacting-particle-sim-1
 author: "Alok Bakshi"
 ---
 
