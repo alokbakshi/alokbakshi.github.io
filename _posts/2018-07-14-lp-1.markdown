@@ -19,7 +19,7 @@ $$
 
 \begin{align*}
 
-\mbox{Maximize  } z = \sum_{i=1}^n c_i x_i \\
+\mbox{Maximize  } z = z_0 + \sum_{i=1}^n c_i x_i \\
 
 \mbox{subjected to the following constraints:} \\
 
@@ -34,7 +34,7 @@ $$
 In the above formulation, there are $$ n $$ variables and $$ m $$ constraints. We will declare $$ \mathbf{x} = \left(x_i\right)_{i=1}^n $$ to be a solution of above if it satisfies all of the above $$ m $$ constraints. An solution $$ \widetilde{\mathbf{x}} = \left(\widetilde{x_i}\right)_{i=1}^n $$ is called an optimal solution if for any other solution  $$ \mathbf{x}' = \left( x'_i \right)_{i=1}^n $$ we have
 
 $$
-\widetilde{z} = \sum_{i=1}^n c_i \widetilde{x_i} \  \geq \ z' = \sum_{i=1}^n c_i x'_i
+\widetilde{z} = \widetilde{z_0} + \sum_{i=1}^n c_i \widetilde{x_i} \  \geq \ z' = z_0' + \sum_{i=1}^n c_i x'_i
 $$
 
 In case the optimal soliution exists we refer to $$ \widetilde{z} $$ as the optimal value. 
@@ -70,12 +70,5 @@ For clarity, we first make sure that none of the above two conditions arise. Thi
 * $$ b_j \geq 0 $$ for all $$ j \in \left\{ 1, 2, \ldots, m\right\} $$
 * Solution space of LP formulation above is bounded from above.
 
-Under these assumptions, there is a unique optimal value (and potentially several optimal solutions) of the above problem. [Simplex method](https://en.wikipedia.org/wiki/Simplex_algorithm) -- and variants thereof -- is one of the most popular algorithm to solve the above problem.
+Under these assumptions, there is an unique optimal value (and potentially several optimal solutions) of the above problem. [Simplex method](https://en.wikipedia.org/wiki/Simplex_algorithm) -- and variants thereof -- is one of the most popular algorithm to solve the above problem and in rest of the post we shall learn the basics behind this method.
 
-Intuitively speaking, we first choose `n-m` variables and assign them the zero value (called non basic variables). Thereafter the remaining `m` variables (called basic variables) can be computed by solving the $$ m \times m $$ system of equations.
-
-Thus we have two separate sets of basic and non basic variables. Now one checks that if one can improve the solution by making a single exchange between the set of "non basic variables" and "basic variables." If it is not possible then we have arrived at the optimal solution otherwise one simply repeats the above procedure.
-
-Theoretically speaking, in worst case scenario one need to make $$ \binom{n}{m} $$ many iterations but in practice the above algorithm runs much faster and performs even better than provably efficient (polynomial time) [algorithms](https://en.wikipedia.org/wiki/Karmarkar%27s_algorithm).
-
-We will now work out a concrete example explaining the logic behind the Simplex Tableaux algorithm.
