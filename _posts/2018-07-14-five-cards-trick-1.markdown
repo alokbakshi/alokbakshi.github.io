@@ -10,7 +10,7 @@ author: "Alok Bakshi"
 
 ## Introduction
 
-Magic in most of the tricks is due to the sleight of hand but the beauty of the "five cards trick" written below  is that performing it needs nothing more than the mental calculation.
+Magic in most of the tricks is due to the sleight of hand but the beauty of the **five cards trick** written below  is that performing it needs nothing more than the mental calculation.
 
 The trick is performed as follows:
 
@@ -57,7 +57,7 @@ As an example, one might simply choose to hide the median $$ x_3 $$ out of the o
 
 Thus relative ordering of the numbers does not provide enough information and we need to incorporate their magnitudes into our calculation as well. 
 
-## An Elegant Solution (based upon Pigeonhole Principle) 
+## An Elegant Solution (based upon the Pigeonhole Principle) 
 
 Having (hopefully) realized the difficulty of problem, let us look at one of the elegant solution, which is an application of [Pigeonhole principle](https://en.wikipedia.org/wiki/Pigeonhole_principle). 
 

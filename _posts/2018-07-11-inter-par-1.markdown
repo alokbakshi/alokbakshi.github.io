@@ -1,0 +1,53 @@
+---
+layout: post
+title:  Interacting Particle Simulation - 1
+date:   2018-07-16 
+permalink: /matmul-1
+author: "Alok Bakshi"
+---
+
+## Introduction
+
+Consider a system of $$ N $$ particles which are confined inside a container of finite volume. Assume that the particles interact each other through only attractive force (say, inverse square gravitational force) and the collision among them as well as between the particle and container boundary is perfectly elastic.
+
+In general, it is not [analytically possible](https://en.wikipedia.org/wiki/N-body_problem) to predict the trajectory of each particle so the only means to study the system at later time is via simulation.  For simplicity, the following modeling assumptions are made
+
+ 
+* Interaction force $$ F(r) $$ between the particles is given by  
+
+$$ 
+\begin{aligned}F(\mathbf{r}) = \begin{cases} \frac{C}{\mid r \mid^2}  \widehat{\mathbf{r}}  & \mid r \mid < \mbox{cutoff} \\ 0 & \mbox{otherwise} \end{cases} \end{aligned}
+$$
+
+* The system is modeled in two dimension even though moving to higher dimension does not require extra effort (except for more computation)
+
+* Density of the particles inside the container is always fixed so that the container dimension (which is a square in two dimension) is a function of the particles count $$ N $$.
+	
+* Initially particles are uniformly distributed with bounded velocities and therefore with high probability (owing to the second law of thermodynamics) the particles (with probability almost equal to one) would remain uniformly distributed inside the container.
+
+One of the naive way to run the simulation is to calculate point to point force between each pair of particles. While accurate this approach does not take advantage of the fact that the force between particles rapidly declines with distance (actually here it's zero after the cutoff) between them.  So for each particle, we shall only consider its neighboring particles (all particles within the cutoff) which cuts down the time complexity from $$ O(N^2) $$ to $$ O(N) $$. Thereafter we shall try to parallelize the above algorithm using OpenMP, MPI, and CUDA frameworks. Note that unlike the naive algorithm (which is embarrassingly parallel) the modified algorithm needs more work to prevent race conditions and deadlocks.
+
+## Optimized Serial Algorithm
+
+In order to optimize the serial code, we first of all note that each particle interacts only with particles inside the “cutoff – neighborhood” of it. Moreover as the density of particles inside the container remains practically constant with time so on average we expect each particle to interact only with finitely many particles. Thus in principle, the code can be made to run in $$ O(N) $$ time.
+
+To that end we first divide the whole container into fixed number of bins. The size of each bin is made nearly equal to the cutoff so that in order to calculate the force on a particle we only need to check for interactions via particles lying inside the current and neighboring bins. Since each bin – in principle – can have as many particles as possible so it is modeled as a linked list. Nevertheless as density is practically constant so almost every such bin will have at most one particle inside it justifying the expected complexity of $$ O(N) $$ run time.
+
+#### OpenMP Code
+
+In case of OpenMP one first make an observation that one can safely do read–only access on shared resources. Therefore we can handover different particles to each thread and those threads can calculate forces on those particles in parallel.
+
+Note that these threads simultaneously access shared resource (namely bin data structure in our case) but since it is only read access so it does not lead to problem. Afterwards one can move particles (i.e. modify their positions and velocity) in parallel as each thread is dealing with different particle.
+
+Finally we need to modify the bin to reflect the change in particle’s position. This step we have to do serially as we are modifying the shared variable (namely bin data structure).
+
+#### MPI Code
+
+For the MPI part, one can use the domain decomposition technique so that each processor handles particles present only in the specific region.
+
+In order to correctly calculate the force on boundary particles each processor needs to get location of particles just outside the boundary (called ghost cells) and this information needs to be updated at the beginning of each iteration. Moreover since particles can jump from one region to another region (which is taken care of by different processor) so one needs to be careful that no particle is lost in between the iterations.
+
+Finally, in my code I've used unsynchronized send and receive routines so as to avoid the deadlock problem and to get better efficiency (as unsynchronized send/receive and computations can be run in parallel). The only caveat is that one needs to be careful to use MPI wait routine before accessing any of the sent data.
+
+
+(to be continued ...) 
