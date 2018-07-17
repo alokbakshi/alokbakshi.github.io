@@ -1,33 +1,114 @@
 ---
 layout: post
 title:  Interacting Particle Simulation - 1
-date:   2018-07-16 
+date:   2018-07-11 
 permalink: /interacting-particle-sim-1
 author: "Alok Bakshi"
 ---
 
 ## Introduction
 
-Consider a system of $$ N $$ particles which are confined inside a container of finite volume. Assume that the particles interact each other through only attractive force (say, inverse square gravitational force) and the collision among them as well as between the particle and container boundary is perfectly elastic.
-
-In general, it is not [analytically possible](https://en.wikipedia.org/wiki/N-body_problem) to predict the trajectory of each particle so the only means to study the system at later time is via simulation.  For simplicity, the following modeling assumptions are made
-
- 
-* Interaction force $$ F(r) $$ between the particles is given by  
+Consider a system of $$ N $$ particles which are confined inside a container of finite volume. Assume that the particles interact each other through only attractive force (say, inverse square gravitational force) and the collision among them as well as between the particle and container boundary is perfectly elastic. For definiteness, say interaction force $$ F^j_i $$ experienced by particle $$ i $$ located at $$ \mathbf{r_i} $$ because of the particles $$ j $$ located at $$ \mathbf{r_j} $$ is given by  
 
 $$ 
-\begin{aligned}F(\mathbf{r}) = \begin{cases} \frac{C}{\mid r \mid^2}  \widehat{\mathbf{r}}  & \mid r \mid < \mbox{cutoff} \\ 0 & \mbox{otherwise} \end{cases} \end{aligned}
+\begin{aligned}F^j_i = \begin{cases} \frac{C}{\mid \mathbf{r} \mid^2}  \widehat{\mathbf{r}}  & \mid r \mid < \mbox{cutoff} \\ 0 & \mbox{otherwise} \end{cases} \end{aligned} \ \ \ \ \ \mbox{ where } \mathbf{r} =  \mathbf{r_i - r_j} 
 $$
 
-* The system is modeled in two dimension even though moving to higher dimension does not require extra effort (except for more computation)
+The total vector force on particle $$ i \in \left\{ 1, 2, \ldots, N \right\} $$ is given by 
+$$
+F_i = \sum_{j = 1, j \neq i}^N F_i^j
+$$
 
-* Density of the particles inside the container is always fixed so that the container dimension (which is a square in two dimension) is a function of the particles count $$ N $$.
+#### Further Modelling Assumptions
+
+In general, it is not [analytically possible](https://en.wikipedia.org/wiki/N-body_problem) to predict the trajectory of each particle in future therefore the only means to study the system at later time is via simulation.  
+
+For simplicity, the following modeling assumptions are made
+
+* The system is modeled in two dimension even though one can easily move to higher dimensions (except requiring far more computation)
+
+* Density of the particles inside the container is chosen to be quite low (one can think of the system to be in *gaseous* state)
 	
-* Initially particles are uniformly distributed with bounded velocities and therefore with high probability (owing to the second law of thermodynamics) the particles (with probability almost equal to one) would remain uniformly distributed inside the container.
+* Initially particles are uniformly distributed with bounded velocities. 
 
-One of the naive way to run the simulation is to calculate point to point force between each pair of particles. While accurate this approach does not take advantage of the fact that the force between particles rapidly declines with distance (actually here it's zero after the cutoff) between them.  So for each particle, we shall only consider its neighboring particles (all particles within the cutoff) which cuts down the time complexity from $$ O(N^2) $$ to $$ O(N) $$. Thereafter we shall try to parallelize the above algorithm using OpenMP, MPI, and CUDA frameworks. Note that unlike the naive algorithm (which is embarrassingly parallel) the modified algorithm needs more work to prevent race conditions and deadlocks.
+
+Under these assumptions, owing to the second law of thermodynamics, the particles would typically remain uniformly distributed inside the container.
+
+
+## Naive Serial Algorithm
+
+One of the naive way to run the simulation is to calculate point to point force between each pair of particles. 
+
+In `C` we first declare the relevant variables
+
+{% highlight C %}
+/* C: Interaction force strength, cutoff: Interaction force cutoff */
+int C, cutoff;
+
+/* N : Number of particles */
+int N;
+
+/* x_pos, y_pos store (x, y) Coordinates of each particle */
+double *x_pos, *y_pos;
+
+/* x_inter_force, y_itr_force : Interaction force on each particle along x and y axes*/
+double *x_itr_force, *y_itr_force;
+{% endhighlight %}
+
+Next, the interaction force along $$ x $$ and $$ y $$ axes namely `x_itr_force` and `y_itr_force` for each particle can be calculated as follows
+
+{% highlight C %}
+
+const int sq_cutoff = cutoff * cutoff;
+
+for(int idx = 0; idx < N; ++idx)
+{
+    double x_force = 0, y_force = 0;
+
+    for(int n_idx = 0; (n_idx < N) && (n_idx != idx); ++n_idx)
+    {
+        double x_diff = x_pos[idx] - x_pos[n_idx];
+        double y_diff = y_pos[idx] - y_pos[n_idx];
+
+        double sq_dist = x_diff * x_diff + y_diff * y_diff;
+
+        if(sq_dist > sq_cutoff)
+            continue;
+
+        double mul_factor = ( C / sq_dist );
+
+        x_force += (mul_factor * x_diff);
+        y_force += (mul_factor * y_diff);
+    }
+
+}
+
+{% endhighlight %}
+
+#### Pros and Cons of naive serial algorithm
+
+Looking at the above algorithm we can see its run time complexity is $$ O(N^2) $$. Thus unless number of particles size is low, it is not a reasonable algorithm to run. 
+
+On a more positive note, each iteration of outside loop can run independently of each other as they do not have any data dependency. Thus parallelizing the above code (in say, OpenMP framework) is as simple as adding one line i.e.
+
+{% highlight C %}
+
+const int sq_cutoff = cutoff * cutoff;
+
+#pragma omp parallel for
+for(int idx = 0; idx < N; ++idx)
+{
+    /* Res of the code */
+}
+
+{% endhighlight %}
 
 ## Optimized Serial Algorithm
+
+Having seen the naive algorithm, let us look at another algorithm which runs on $$ O(N) $$ time. The intuition behind it is that each particle is influenced only by the surrounding particles i.e. which lie at most within the `cutoff` distance. 
+
+So for each particle, we shall only consider its neighboring particles (all particles within the cutoff) which cuts down the time complexity from $$ O(N^2) $$ to $$ O(N) $$. Thereafter we shall try to parallelize the above algorithm using OpenMP, MPI, and CUDA frameworks. Note that unlike the naive algorithm (which is embarrassingly parallel) the modified algorithm needs more work to prevent race conditions and deadlocks.
+
 
 In order to optimize the serial code, we first of all note that each particle interacts only with particles inside the “cutoff – neighborhood” of it. Moreover as the density of particles inside the container remains practically constant with time so on average we expect each particle to interact only with finitely many particles. Thus in principle, the code can be made to run in $$ O(N) $$ time.
 
