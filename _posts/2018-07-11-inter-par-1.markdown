@@ -109,8 +109,8 @@ for(int idx = 0; idx < N; ++idx)
 
 In order to optimize the serial code, we first of all observe that each particle interacts only with particles inside the *cutoff – neighborhood* of it. Moreover as the density of particles inside the container remains practically constant with time so on average we expect each particle to interact only with finitely many particles. Thus in principle, the code can be made to run in $$ O(N) $$ time.
 
-To that end we first divide the whole container into fixed number of bins. The size of each bin is made nearly equal to the cutoff so that in order to calculate the force on a particle we only need to check for interactions via particles lying inside the current and neighboring bins. Since each bin – in principle – can have as many particles as possible so it is modeled as a linked list. Nevertheless as density is practically constant so almost every such bin will have at most one particle inside it justifying the expected complexity of $$ O(N) $$ run time.
+To that end we first divide the whole container into fixed number of bins. The size of each bin is made nearly equal to the cutoff (say `1.01 * cutoff`) so that in order to calculate the force on a particle we only need to check for interactions via particles lying inside the current and neighboring bins. Since each bin – in principle – can have as many particles as possible (each particle is conveniently modelled as point particle with no internal structure) therefore we associate `Linked List` data structure to each of the bin, which if needed, can accomodate more than one particle. 
 
+Nevertheless as density is practically constant so almost every such bin will have at most one particle inside it justifying the expected complexity of $$ O(N) $$ run time.
 
-
-( to be continued ... ) 
+(to be continued...)
