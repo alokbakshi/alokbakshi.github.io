@@ -1,18 +1,13 @@
 ---
 layout: page
-title: About
+title: About Me
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+Hello, 
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+Purpose of this blog is twofold, namely `explain` as well as `learn` the topics I am currently interested in. If you have any comments or suggestions, you can contact me through here [here](mailto:alok.kumar.bakshi@gmail.com).
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+Thanks for visiting,
+Alok Bakshi
 
-
-[jekyll-organization]: https://github.com/jekyll
