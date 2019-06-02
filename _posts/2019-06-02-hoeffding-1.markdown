@@ -1,0 +1,9 @@
+---
+layout: post
+title:  Hoeffding Lemma - 1
+date:   2019-06-02 
+permalink: /hoeffding-1
+author: "Alok Bakshi"
+---
+
+## Introduction
