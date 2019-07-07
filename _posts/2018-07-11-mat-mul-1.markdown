@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  Matrix Multiplication - 1
-date:   2018-07-11 
+title:  Matrix Multiplication
+date:   2018-07-11
 permalink: /matmul-1
 author: "Alok Bakshi"
 ---

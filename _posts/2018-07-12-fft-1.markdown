@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Fast Fourier Transformation - 1
+title:  Fast Fourier Transformation
 date:   2018-07-12 
 permalink: /fft-1
 author: "Alok Bakshi"

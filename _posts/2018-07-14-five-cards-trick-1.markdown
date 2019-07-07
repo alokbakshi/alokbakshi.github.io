@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Five Cards Trick - 1
+title:  Five Cards Trick
 date:   2018-07-12 
 permalink: /fivecardstrick-1
 author: "Alok Bakshi"
